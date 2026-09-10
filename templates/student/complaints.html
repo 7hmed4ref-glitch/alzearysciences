@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}شكاويي{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-exclamation-triangle"></i> شكاويي</h2>
+    <a href="{{ url_for('student_complaint') }}" class="btn btn-danger">
+        <i class="bi bi-plus-circle"></i> تقديم شكوى جديدة
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if complaints %}
+        {% for complaint in complaints %}
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between">
+                <strong>{{ complaint.subject }}</strong>
+                <small>{{ complaint.created_at.strftime('%Y-%m-%d') }}</small>
+            </div>
+            <div class="card-body">
+                <p>{{ complaint.message }}</p>
+                {% if complaint.admin_response %}
+                <div class="alert alert-info">
+                    <strong>رد الإدارة:</strong> {{ complaint.admin_response }}
+                </div>
+                {% endif %}
+                <span class="badge {% if complaint.status == 'resolved' %}bg-success{% elif complaint.status == 'in_progress' %}bg-warning{% else %}bg-danger{% endif %}">
+                    {% if complaint.status == 'resolved' %}تم الحل{% elif complaint.status == 'in_progress' %}قيد المعالجة{% else %}قيد الانتظار{% endif %}
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="alert alert-info">لا توجد شكاوي لديك</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

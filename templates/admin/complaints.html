@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}الشكاوي{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-exclamation-triangle"></i> شكاوي الطلاب</h2>
+
+<div class="card">
+    <div class="card-body">
+        {% if complaints %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>الطالب</th>
+                        <th>الموضوع</th>
+                        <th>الرسالة</th>
+                        <th>الحالة</th>
+                        <th>التاريخ</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for complaint in complaints %}
+                    <tr>
+                        <td>{{ complaint.id }}</td>
+                        <td>{{ complaint.user.name }}</td>
+                        <td>{{ complaint.subject }}</td>
+                        <td>{{ complaint.message[:50] }}...</td>
+                        <td>
+                            {% if complaint.status == 'resolved' %}
+                            <span class="badge bg-success">تم الحل</span>
+                            {% elif complaint.status == 'in_progress' %}
+                            <span class="badge bg-warning">قيد المعالجة</span>
+                            {% else %}
+                            <span class="badge bg-danger">قيد الانتظار</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ complaint.created_at.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modal{{ complaint.id }}">
+                                <i class="bi bi-chat"></i> رد
+                            </button>
+                        </td>
+                    </tr>
+                    
+                    <div class="modal fade" id="modal{{ complaint.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="POST" action="{{ url_for('admin_respond_complaint', complaint_id=complaint.id) }}">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">الرد على الشكوى</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p><strong>الشكوى:</strong> {{ complaint.message }}</p>
+                                        <hr>
+                                        <div class="mb-3">
+                                            <label class="form-label">الرد</label>
+                                            <textarea class="form-control" name="admin_response" rows="4">{{ complaint.admin_response or '' }}</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">الحالة</label>
+                                            <select class="form-select" name="status">
+                                                <option value="pending" {% if complaint.status == 'pending' %}selected{% endif %}>قيد الانتظار</option>
+                                                <option value="in_progress" {% if complaint.status == 'in_progress' %}selected{% endif %}>قيد المعالجة</option>
+                                                <option value="resolved" {% if complaint.status == 'resolved' %}selected{% endif %}>تم الحل</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-primary">إرسال الرد</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">لا توجد شكاوي حالياً</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

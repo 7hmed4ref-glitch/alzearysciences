@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}{% if quiz %}تعديل الاختبار{% else %}إضافة اختبار جديد{% endif %}{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">
+    <i class="bi bi-question-circle"></i> 
+    {% if quiz %}تعديل الاختبار{% else %}إضافة اختبار لدرس: {{ lesson.title }}{% endif %}
+</h2>
+
+<div class="row">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" id="quizForm">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">عنوان الاختبار</label>
+                        <input type="text" class="form-control" id="title" name="title" 
+                               value="{{ quiz.title if quiz else 'اختبار الدرس' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="passing_score" class="form-label">درجة النجاح (%)</label>
+                        <input type="number" class="form-control" id="passing_score" name="passing_score" 
+                               value="{{ quiz.passing_score if quiz else '70' }}" min="0" max="100">
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <h4><i class="bi bi-list-check"></i> الأسئلة</h4>
+                    
+                    <div id="questions_container">
+                        <!-- Questions will be added here -->
+                    </div>
+                    
+                    <button type="button" class="btn btn-outline-primary mb-3" onclick="addQuestion()">
+                        <i class="bi bi-plus-circle"></i> إضافة سؤال
+                    </button>
+                    
+                    <hr class="my-4">
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg"></i> حفظ الاختبار
+                    </button>
+                    <a href="{{ url_for('admin_lessons', course_id=lesson.course_id) }}" class="btn btn-secondary">إلغاء</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let questionCount = 0;
+
+function addQuestion() {
+    questionCount++;
+    const container = document.getElementById('questions_container');
+    
+    const questionDiv = document.createElement('div');
+    questionDiv.className = 'card mb-3';
+    questionDiv.innerHTML = `
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <label class="form-label">نص السؤال</label>
+                    <textarea class="form-control" name="question_text[]" required></textarea>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">نوع السؤال</label>
+                    <select class="form-select" name="question_type[]" onchange="toggleOptions(this)">
+                        <option value="multiple_choice">اختيار من متعدد</option>
+                        <option value="true_false">صح/خطأ</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-6 mb-3 options-container">
+                    <label class="form-label">الإجابة الصحيحة</label>
+                    <select class="form-select" name="correct_answer[]" required>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-3 mb-3 option_a">
+                    <label class="form-label">الخيار A</label>
+                    <input type="text" class="form-control" name="option_a[]" required>
+                </div>
+                
+                <div class="col-md-3 mb-3 option_b">
+                    <label class="form-label">الخيار B</label>
+                    <input type="text" class="form-control" name="option_b[]" required>
+                </div>
+                
+                <div class="col-md-3 mb-3 option_c">
+                    <label class="form-label">الخيار C</label>
+                    <input type="text" class="form-control" name="option_c[]" required>
+                </div>
+                
+                <div class="col-md-3 mb-3 option_d">
+                    <label class="form-label">الخيار D</label>
+                    <input type="text" class="form-control" name="option_d[]" required>
+                </div>
+            </div>
+            
+            <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('.card').remove()">
+                <i class="bi bi-trash"></i> حذف السؤال
+            </button>
+        </div>
+    `;
+    
+    container.appendChild(questionDiv);
+}
+
+function toggleOptions(select) {
+    const card = select.closest('.card');
+    const optionsContainer = card.querySelector('.options-container');
+    
+    if (select.value === 'true_false') {
+        card.querySelectorAll('.option_a, .option_b, .option_c, .option_d').forEach(el => {
+            el.style.display = 'none';
+            el.querySelectorAll('input').forEach(input => input.removeAttribute('required'));
+        });
+        
+        optionsContainer.innerHTML = `
+            <label class="form-label">الإجابة الصحيحة</label>
+            <select class="form-select" name="correct_answer[]" required>
+                <option value="True">صح</option>
+                <option value="False">خطأ</option>
+            </select>
+        `;
+    } else {
+        card.querySelectorAll('.option_a, .option_b, .option_c, .option_d').forEach(el => {
+            el.style.display = 'block';
+            el.querySelectorAll('input').forEach(input => input.setAttribute('required', ''));
+        });
+        
+        optionsContainer.innerHTML = `
+            <label class="form-label">الإجابة الصحيحة</label>
+            <select class="form-select" name="correct_answer[]" required>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+            </select>
+        `;
+    }
+}
+
+// Add initial question
+addQuestion();
+</script>
+{% endblock %}

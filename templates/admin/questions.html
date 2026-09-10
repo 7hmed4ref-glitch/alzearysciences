@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}الاستفسارات{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-question-circle"></i> استفسارات الطلاب</h2>
+
+<div class="card">
+    <div class="card-body">
+        {% if questions %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>الطالب</th>
+                        <th>الموضوع</th>
+                        <th>الرسالة</th>
+                        <th>الحالة</th>
+                        <th>التاريخ</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for question in questions %}
+                    <tr>
+                        <td>{{ question.id }}</td>
+                        <td>{{ question.user.name }}</td>
+                        <td>{{ question.subject }}</td>
+                        <td>{{ question.message[:50] }}...</td>
+                        <td>
+                            {% if question.is_resolved %}
+                            <span class="badge bg-success">تم الحل</span>
+                            {% else %}
+                            <span class="badge bg-warning">قيد الانتظار</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ question.created_at.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modal{{ question.id }}">
+                                <i class="bi bi-chat"></i> رد
+                            </button>
+                        </td>
+                    </tr>
+                    
+                    <!-- Modal -->
+                    <div class="modal fade" id="modal{{ question.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="POST" action="{{ url_for('admin_respond_question', question_id=question.id) }}">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">الرد على الاستفسار</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p><strong>السؤال:</strong> {{ question.message }}</p>
+                                        <hr>
+                                        <div class="mb-3">
+                                            <label class="form-label">الرد</label>
+                                            <textarea class="form-control" name="response" rows="4" required>{{ question.response or '' }}</textarea>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input" name="is_resolved" {% if question.is_resolved %}checked{% endif %}>
+                                            <label class="form-check-label">تم حل الاستفسار</label>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-primary">إرسال الرد</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">لا توجد استفسارات حالياً</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

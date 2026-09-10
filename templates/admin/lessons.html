@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}دروس {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2><i class="bi bi-list-ul"></i> دروس {{ course.title }}</h2>
+        <a href="{{ url_for('admin_courses') }}" class="text-decoration-none">العودة للمقررات</a>
+    </div>
+    <a href="{{ url_for('admin_add_lesson', course_id=course.id) }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> إضافة درس جديد
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if lessons %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>عنوان الدرس</th>
+                        <th>الفيديو</th>
+                        <th>ملف PDF</th>
+                        <th>الاختبار</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lesson in lessons %}
+                    <tr>
+                        <td>{{ lesson.order_index + 1 }}</td>
+                        <td>{{ lesson.title }}</td>
+                        <td>
+                            {% if lesson.video_filename %}
+                            <span class="badge bg-success"><i class="bi bi-check"></i> موجود</span>
+                            {% else %}
+                            <span class="badge bg-danger"><i class="bi bi-x"></i> غير موجود</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if lesson.pdf_filename %}
+                            <span class="badge bg-success"><i class="bi bi-check"></i> موجود</span>
+                            {% else %}
+                            <span class="badge bg-secondary">لا يوجد</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if lesson.quiz %}
+                            <span class="badge bg-success"><i class="bi bi-check"></i> موجود</span>
+                            {% else %}
+                            <a href="{{ url_for('admin_add_quiz', lesson_id=lesson.id) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-plus"></i> إضافة
+                            </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('admin_edit_lesson', lesson_id=lesson.id) }}" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-pencil"></i> تعديل
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> لا توجد دروس حالياً. أضف درس جديد للبدء.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
