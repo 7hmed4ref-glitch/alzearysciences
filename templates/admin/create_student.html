@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}إنشاء حساب طالب{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-person-plus"></i> إنشاء حساب طالب جديد</h2>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">اسم الطالب</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="generate_credentials" name="generate_credentials">
+                        <label class="form-check-label" for="generate_credentials">
+                            توليد رقم هاتف وكلمة مرور تلقائياً (بدون بريد إلكتروني)
+                        </label>
+                    </div>
+                    
+                    <div id="manual_fields">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">البريد الإلكتروني (اختياري)</label>
+                            <input type="email" class="form-control" id="email" name="email">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">رقم الهاتف (اختياري)</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" placeholder="01xxxxxxxxx">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">كلمة المرور</label>
+                            <input type="password" class="form-control" id="password" name="password">
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> إذا قمت بتحديد خيار التوليد التلقائي، سيتم إنشاء رقم هاتف وكلمة مرور عشوائيين.
+                        <br>يمكنك إعطاء هذه البيانات للطالب مباشرة دون الحاجة لتسجيل جديد.
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg"></i> إنشاء الحساب
+                    </button>
+                    <a href="{{ url_for('admin_students') }}" class="btn btn-secondary">إلغاء</a>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5><i class="bi bi-lightbulb"></i> ملاحظات</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2">✓ يمكن إنشاء حساب بدون بريد إلكتروني</li>
+                    <li class="mb-2">✓ يمكن إنشاء حساب بدون رقم هاتف</li>
+                    <li class="mb-2">✓ يتم قبول الحساب تلقائياً</li>
+                    <li class="mb-2">✓ يمكن توليد بيانات دخول عشوائية</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('generate_credentials').addEventListener('change', function() {
+    const manualFields = document.getElementById('manual_fields');
+    if (this.checked) {
+        manualFields.style.opacity = '0.5';
+        manualFields.style.pointerEvents = 'none';
+    } else {
+        manualFields.style.opacity = '1';
+        manualFields.style.pointerEvents = 'auto';
+    }
+});
+</script>
+{% endblock %}

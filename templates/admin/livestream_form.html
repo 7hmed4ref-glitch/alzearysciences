@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}{% if stream %}تعديل البث{% else %}بث جديد{% endif %}{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">{% if stream %}تعديل البث المباشر{% else %}إضافة بث مباشر جديد{% endif %}</h2>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">عنوان البث</label>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ stream.title if stream else '' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">وصف البث</label>
+                        <textarea class="form-control" id="description" name="description" rows="3">{{ stream.description if stream else '' }}</textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="stream_url" class="form-label">رابط البث (YouTube Live, OBS, etc.)</label>
+                        <input type="url" class="form-control" id="stream_url" name="stream_url" value="{{ stream.stream_url if stream else '' }}" placeholder="https://www.youtube.com/embed/...">
+                        <div class="form-text">استخدم رابط التضمين (embed) من YouTube أو أي منصة بث أخرى</div>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="is_active" name="is_active" {% if stream and stream.is_active %}checked{% endif %}>
+                        <label class="form-check-label" for="is_active">نشط الآن (سيظهر للطلاب)</label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-camera-video"></i> {% if stream %}حفظ التعديلات{% else %}بدء البث{% endif %}
+                    </button>
+                    <a href="{{ url_for('admin_livestreams') }}" class="btn btn-secondary">إلغاء</a>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5><i class="bi bi-info-circle"></i> كيفية الإعداد</h5>
+                <ol class="list-unstyled">
+                    <li class="mb-2">1. أنشئ بث مباشر على YouTube</li>
+                    <li class="mb-2">2. انسخ رابط التضمين (Embed URL)</li>
+                    <li class="mb-2">3. ألصق الرابط في الحقل أعلاه</li>
+                    <li class="mb-2">4. فعل خيار "نشط الآن"</li>
+                    <li class="mb-2">5. سيظهر البث لجميع الطلاب</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

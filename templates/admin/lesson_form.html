@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}{% if lesson %}تعديل الدرس{% else %}إضافة درس جديد{% endif %}{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">
+    <i class="bi bi-file-play"></i> 
+    {% if lesson %}تعديل الدرس{% else %}إضافة درس جديد{% endif %}
+</h2>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">عنوان الدرس</label>
+                        <input type="text" class="form-control" id="title" name="title" 
+                               value="{{ lesson.title if lesson else '' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">وصف الدرس</label>
+                        <textarea class="form-control" id="description" name="description" rows="3">{{ lesson.description if lesson else '' }}</textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="order_index" class="form-label">ترتيب الدرس</label>
+                        <input type="number" class="form-control" id="order_index" name="order_index" 
+                               value="{{ lesson.order_index if lesson else '0' }}" min="0">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="video" class="form-label">ملف الفيديو</label>
+                        {% if lesson and lesson.video_filename %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> الفيديو الحالي: {{ lesson.video_filename }}
+                        </div>
+                        {% endif %}
+                        <input type="file" class="form-control" id="video" name="video" accept="video/*">
+                        <div class="form-text">الصيغ المسموحة: mp4, avi, mov, mkv, webm</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="pdf" class="form-label">ملف PDF (اختياري)</label>
+                        {% if lesson and lesson.pdf_filename %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> ملف PDF الحالي: {{ lesson.pdf_filename }}
+                        </div>
+                        {% endif %}
+                        <input type="file" class="form-control" id="pdf" name="pdf" accept=".pdf">
+                        <div class="form-text">سيظهر هذا الملف للطلاب أسفل الفيديو</div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg"></i> {% if lesson %}حفظ التعديلات{% else %}إضافة الدرس{% endif %}
+                    </button>
+                    <a href="{{ url_for('admin_lessons', course_id=course.id) }}" class="btn btn-secondary">إلغاء</a>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5><i class="bi bi-lightbulb"></i> ملاحظات</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2">✓ يجب رفع فيديو لكل درس</li>
+                    <li class="mb-2">✓ يمكن إضافة ملف PDF اختياري</li>
+                    <li class="mb-2">✓ يتم تحديد ترتيب الدرس</li>
+                    <li class="mb-2">✓ يمكن إضافة اختبار بعد إنشاء الدرس</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

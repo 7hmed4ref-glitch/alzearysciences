@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}الامتحانات{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-file-text"></i> إدارة الامتحانات</h2>
+    <a href="{{ url_for('admin_add_exam') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> إضافة امتحان جديد
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if exams %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>عنوان الامتحان</th>
+                        <th>المقرر</th>
+                        <th>المدة (دقيقة)</th>
+                        <th>درجة النجاح</th>
+                        <th>الحالة</th>
+                        <th>عدد الأسئلة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for exam in exams %}
+                    <tr>
+                        <td>{{ exam.id }}</td>
+                        <td>{{ exam.title }}</td>
+                        <td>{{ exam.course.title }}</td>
+                        <td>{{ exam.duration_minutes }}</td>
+                        <td>{{ exam.passing_score }}%</td>
+                        <td>
+                            {% if exam.is_active %}
+                            <span class="badge bg-success">نشط</span>
+                            {% else %}
+                            <span class="badge bg-secondary">غير نشط</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ exam.questions|length }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> لا توجد امتحانات حالياً. أضف امتحان جديد للبدء.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

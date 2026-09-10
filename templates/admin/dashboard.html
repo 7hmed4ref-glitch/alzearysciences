@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}لوحة تحكم المدير{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-speedometer2"></i> لوحة تحكم المدير</h2>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-people"></i> الطلاب</h5>
+                <h2>{{ students|length }}</h2>
+                <a href="{{ url_for('admin_students') }}" class="text-white">عرض الكل</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-hourglass-split"></i> قيد المراجعة</h5>
+                <h2>{{ pending_students|length }}</h2>
+                <a href="{{ url_for('admin_students') }}" class="text-dark">مراجعة الطلبات</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-book"></i> المقررات</h5>
+                <h2>{{ courses|length }}</h2>
+                <a href="{{ url_for('admin_courses') }}" class="text-white">إدارة المقررات</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-file-text"></i> الامتحانات</h5>
+                <h2>{{ exams_count }}</h2>
+                <a href="{{ url_for('admin_exams') }}" class="text-white">إدارة الامتحانات</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-person-plus"></i> إضافة طالب جديد</h5>
+            </div>
+            <div class="card-body">
+                <p>يمكنك إنشاء حساب طالب جديد مباشرة</p>
+                <a href="{{ url_for('admin_create_student') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> إنشاء حساب طالب
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-broadcast"></i> البث المباشر</h5>
+            </div>
+            <div class="card-body">
+                <p>إنشاء بث مباشر جديد للطلاب</p>
+                <a href="{{ url_for('admin_add_livestream') }}" class="btn btn-danger">
+                    <i class="bi bi-camera-video"></i> بدء بث جديد
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if pending_students %}
+<div class="card mt-4">
+    <div class="card-header bg-warning text-dark">
+        <h5><i class="bi bi-bell"></i> طلبات قبول جديدة ({{ pending_students|length }})</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>البريد الإلكتروني</th>
+                        <th>رقم الهاتف</th>
+                        <th>تاريخ التسجيل</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in pending_students[:5] %}
+                    <tr>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.email }}</td>
+                        <td>{{ student.phone }}</td>
+                        <td>{{ student.created_at.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <a href="{{ url_for('approve_student', student_id=student.id) }}" class="btn btn-sm btn-success">
+                                <i class="bi bi-check-lg"></i> قبول
+                            </a>
+                            <a href="{{ url_for('reject_student', student_id=student.id) }}" class="btn btn-sm btn-danger">
+                                <i class="bi bi-x-lg"></i> رفض
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if pending_students|length > 5 %}
+        <a href="{{ url_for('admin_students') }}" class="btn btn-outline-primary">عرض جميع الطلبات</a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

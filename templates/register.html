@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}تسجيل جديد{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card">
+            <div class="card-body p-5">
+                <h2 class="text-center mb-4">
+                    <i class="bi bi-person-plus"></i> تسجيل جديد
+                </h2>
+                
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">الاسم الكامل</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">البريد الإلكتروني</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">رقم الهاتف (مصري)</label>
+                        <input type="tel" class="form-control" id="phone" name="phone" 
+                               placeholder="01xxxxxxxxx" pattern="01[0-9]{9}" required>
+                        <div class="form-text">يجب أن يكون رقم هاتف مصري يبدأ بـ 01 ويتكون من 11 رقم</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">كلمة المرور</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">تأكيد كلمة المرور</label>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="bi bi-info-circle"></i> سيتم مراجعة طلبك من قبل الإدارة وسيتم إعلامك عند القبول.
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-person-plus"></i> تسجيل
+                        </button>
+                    </div>
+                </form>
+                
+                <hr class="my-4">
+                
+                <div class="text-center">
+                    <p class="mb-0">لديك حساب بالفعل؟</p>
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-primary mt-2">
+                        <i class="bi bi-box-arrow-in-right"></i> تسجيل الدخول
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

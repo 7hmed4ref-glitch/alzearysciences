@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}{{ lesson.title }}{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('student_course', course_id=lesson.course_id) }}" class="text-decoration-none">
+        <i class="bi bi-arrow-right"></i> العودة للمقرر
+    </a>
+</div>
+
+<h2 class="mb-4">{{ lesson.title }}</h2>
+
+{% if not can_access and blocked_lesson %}
+<div class="alert alert-warning">
+    <i class="bi bi-lock-fill"></i> 
+    يجب عليك إكمال الدرس السابق أولاً: <strong>{{ blocked_lesson.title }}</strong>
+    <br>
+    (مشاهدة الفيديو واجتياز الاختبار)
+</div>
+{% else %}
+<div class="row">
+    <div class="col-md-8">
+        {% if lesson.video_filename %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="video-container">
+                    <video controls id="lessonVideo" onended="markAsWatched()">
+                        <source src="{{ url_for('serve_video', filename=lesson.video_filename) }}" type="video/mp4">
+                        متصفحك لا يدعم تشغيل الفيديو.
+                    </video>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-info">لا يوجد فيديو لهذا الدرس حالياً</div>
+        {% endif %}
+        
+        {% if lesson.pdf_filename %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="bi bi-file-pdf"></i> ملف PDF المرفق</h5>
+            </div>
+            <div class="card-body">
+                <a href="{{ url_for('serve_pdf', filename=lesson.pdf_filename) }}" class="btn btn-danger" target="_blank">
+                    <i class="bi bi-download"></i> تحميل ملف PDF
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="bi bi-info-circle"></i> حالة التقدم</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="d-flex justify-content-between">
+                        <span>مشاهدة الفيديو</span>
+                        {% if progress.watched %}
+                        <i class="bi bi-check-circle-fill text-success"></i>
+                        {% else %}
+                        <i class="bi bi-circle text-muted"></i>
+                        {% endif %}
+                    </label>
+                    <div class="progress">
+                        <div class="progress-bar {% if progress.watched %}bg-success{% endif %}" role="progressbar" style="width: {{ '100' if progress.watched else '0' }}%"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="d-flex justify-content-between">
+                        <span>اجتياز الاختبار</span>
+                        {% if progress.quiz_passed %}
+                        <i class="bi bi-check-circle-fill text-success"></i>
+                        {% else %}
+                        <i class="bi bi-circle text-muted"></i>
+                        {% endif %}
+                    </label>
+                    <div class="progress">
+                        <div class="progress-bar {% if progress.quiz_passed %}bg-success{% endif %}" role="progressbar" style="width: {{ '100' if progress.quiz_passed else '0' }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if quiz %}
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-question-circle"></i> اختبار الدرس</h5>
+            </div>
+            <div class="card-body">
+                {% if quiz_attempt %}
+                <div class="alert {% if quiz_attempt.passed %}alert-success{% else %}alert-warning{% endif %}">
+                    <strong>نتيجتك: {{ quiz_attempt.score }}%</strong>
+                    {% if quiz_attempt.passed %}
+                    <br>مبروك! لقد اجتزت الاختبار.
+                    {% else %}
+                    <br>يمكنك إعادة المحاولة.
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                <a href="{{ url_for('student_quiz', quiz_id=quiz.id) }}" class="btn btn-primary w-100">
+                    {% if quiz_attempt and not quiz_attempt.passed %}إعادة الاختبار{% else %}بدء الاختبار{% endif %}
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function markAsWatched() {
+    fetch('{{ url_for("student_mark_watched", lesson_id=lesson.id) }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+</script>
+{% endblock %}

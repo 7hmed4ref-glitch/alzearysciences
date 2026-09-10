@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}إدارة الطلاب{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-people"></i> إدارة الطلاب</h2>
+    <a href="{{ url_for('admin_create_student') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> إضافة طالب جديد
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>الاسم</th>
+                        <th>البريد الإلكتروني</th>
+                        <th>رقم الهاتف</th>
+                        <th>الحالة</th>
+                        <th>تاريخ التسجيل</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>{{ student.id }}</td>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.email or '-' }}</td>
+                        <td>{{ student.phone or '-' }}</td>
+                        <td>
+                            {% if student.is_approved %}
+                            <span class="badge bg-success">مقبول</span>
+                            {% elif student.is_pending %}
+                            <span class="badge bg-warning">قيد المراجعة</span>
+                            {% else %}
+                            <span class="badge bg-danger">مرفوض</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ student.created_at.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            {% if not student.is_approved and student.is_pending %}
+                            <a href="{{ url_for('approve_student', student_id=student.id) }}" class="btn btn-sm btn-success">
+                                <i class="bi bi-check-lg"></i> قبول
+                            </a>
+                            <a href="{{ url_for('reject_student', student_id=student.id) }}" class="btn btn-sm btn-danger">
+                                <i class="bi bi-x-lg"></i> رفض
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
